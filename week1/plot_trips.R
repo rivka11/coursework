@@ -1,3 +1,4 @@
+
 ########################################
 # load libraries
 ########################################
@@ -19,21 +20,39 @@ load('trips.RData')
 
 # plot the distribution of trip times across all rides
 
+ggplot(trips, aes(x = tripduration)) +
+  geom_density() 
+?geom_density
 # plot the distribution of trip times by rider type
-
-# plot the total number of trips over each day
-
-# plot the total number of trips (on the y axis) by age (on the x axis) and age (indicated with color)
-
-# plot the ratio of male to female trips (on the y axis) by age (on the x axis)
+  ggplot(trips, aes(x = tripduration, fill = usertype)) + 
+    geom_histogram(bins = 60)+ xlim(0, 10)
+# plot the number of trips over each day
+ggplot(trips, aes(x = ymd)) + geom_histogram() # use group by
+# plot the number of trips by gender and age group_by(age, gender)
+trips %>% group_by(gender, age) %>% summarise(count=n())
+ggplot(trips, aes(x = birth_year, fill = gender)) + geom_point(bins = 50, alpha = .25)
+# plot the ratio of male to female trips by age
+spread(trips, birth_year, gender) %>% ggplot(trips, aes(x = ))
+ggplot(trips, aes(x= birth_year, y= count(gender), color = gender, bins = 30))
 # hint: use the spread() function to reshape things to make it easier to compute this ratio
+#INCOMPLETE!
+?group_by
 
+
+# remove unknown
+# group by (age, gender)
+# s
+
+r <- (spread(trips, gender, birth_year) %>% group_by(Male) %>% count(Male))
+(spread(trips, gender, birth_year) %>% group_by(Female) %>% count(Female))
+count(trips, vars=c("birth","Size"))
+?count
 ########################################
 # plot weather data
 ########################################
-# plot the minimum temperature (on the y axis) over each day (on the x axis)
-
-# plot the minimum temperature and maximum temperature (on the y axis, with different colors) over each day (on the x axis)
+# plot the minimum temperature over each day
+ggplot(weather, aes(x = ymd, y = tmin)) + geom_point() + geom_smooth()
+# plot the minimum temperature and maximum temperature over each day
 # hint: try using the gather() function for this to reshape things before plotting
 
 ########################################
