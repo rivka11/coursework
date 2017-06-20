@@ -53,6 +53,8 @@ count(trips, vars=c("birth","Size"))
 # plot the minimum temperature over each day
 ggplot(weather, aes(x = ymd, y = tmin)) + geom_point() + geom_smooth()
 # plot the minimum temperature and maximum temperature over each day
+
+
 # hint: try using the gather() function for this to reshape things before plotting
 
 ########################################
@@ -65,6 +67,8 @@ trips_with_weather <- inner_join(trips, weather, by="ymd")
 # plot the number of trips as a function of the minimum temperature, where each point represents a day
 # you'll need to summarize the trips and join to the weather data to do this
 
+trips %>% group_by(ymd, bikeid) %>% 
+  mutate(numTrips =n()) %>% inner_join(weather, by = "ymd") %>% ggplot(aes(x = tripduration, y= tmin)) + geom_point()
 # repeat this, splitting results by whether there was substantial precipitation or not
 # you'll need to decide what constitutes "substantial precipitation" and create a new T/F column to indicate this
 

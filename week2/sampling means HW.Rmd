@@ -30,7 +30,7 @@ library(reshape2)
 #colnames(mydata)[1-17]
 X <- NULL
 # Create a variable n which is the number of observations we'll look at.  
-n = 1000
+n = 10000
 
 #The variable p will be the width of that variable.  
 p = 2
@@ -44,8 +44,8 @@ head(X)
 hist(X[,1])
 
 #NOTE: if you wanted to draw from something with a non-zero mean and more interesting variance that's: rnorm(n*p)*st_dev + mu
-st_dev <- 2
-mu <- 50
+st_dev <- 3
+mu <- 10
 
 X[,1] <- X[,1]*st_dev + mu
 X <-data.frame(X)
@@ -80,19 +80,32 @@ obs_count <- length(obs_vec)
 sim_power = matrix(0, obs_count, 3)
 sim_power[,1]<-obs_vec
 sim_power <- data.frame(sim_power)
-colnames(sim_power) <- c("Number_Obs","mean","st_error")
+colnames(sim_power) <- c("Number_Obs","quantile","st_error")
 #Reset sample_means
 sample_means <- NULL
 sample_means = rep(0,total_samps)
+quartileVector = rep(0, 100)
 
+
+# for each sample size ake sample and find mean 100 times for each one
+for(r in 1:100){
 for (j in 1:obs_count) {
   for (i in 1:total_samps) {
-  subsample <- c(sample(X[,1], sim_power[j,1]))
-  sample_means[i] = mean(subsample)
+    # do qantile on means here
+  subsample <- c(sample(X[,1], sim_power[j,1])) # sim poiwer is size od sample to choose
+  sample_means[i] = mean(subsample) 
   }
-  sim_power[j,2] <- mean(sample_means)
+  sim_power[j,2] <- quantile(sample_means, .05) #mean(sample_means)
   sim_power[j,3] <- st_dev/(sim_power[j,1]^.5)
 }
+  x <- filter(sim_power, quantile > 9)[1, 1]
+  quartileVector[r] = x[1]
+
+}
+quartileVector <- as.data.frame(quartileVector)
+v <- summary(quartileVector)
+
+filter(sim_power, quantile > 9)
 
 
 ggplot(sim_power, aes(Number_Obs)) + geom_line(aes(y=mean),colour = "blue") 
@@ -106,4 +119,4 @@ ggplot(sim_power, aes(Number_Obs)) + geom_line(aes(y=st_error),colour = "red")
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+#Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated t#he plot.
