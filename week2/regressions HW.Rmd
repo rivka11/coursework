@@ -1,0 +1,53 @@
+---
+title: "Coefficients and bias"
+author: "Jacob LaRiviere"
+date: "June 18, 2017, 2017"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+```
+
+## R Markdown
+
+This is an R Markdown document. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+
+
+```{r}
+
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2)
+
+
+#setwd("C:/Users/jlariv/OneDrive/Econ 404/")
+ojdata <- read.csv("oj.csv")
+#1
+ggplot(ojdata, aes("",price)) + geom_boxplot(width=.25)
+#2
+ggplot(ojdata, aes(factor(brand), log(price))) + geom_boxplot(aes(fill = factor(brand)))
+#3
+ggplot(ojdata, aes(factor(brand), price)) + geom_boxplot(aes(fill = factor(brand)))
+#4
+ggplot(ojdata, aes(x = log(price), y= logmove)) + geom_point(aes(color = factor(brand)))
+#5
+y <- glm(formula = logmove ~ log(price), data=ojdata)
+summary(y)
+
+#6
+v <- glm(formula = logmove ~ log(price) + brand, data=ojdata)
+summary(v)
+
+#7
+w <- glm(formula = logmove ~ log(price)*brand, data=ojdata)
+summary(w)
+
+#8
+ggplot(ojdata, aes(x= factor(brand), y = feat)) + geom_point(position = "jitter", aes(color=factor(brand)))
+
+
+```
