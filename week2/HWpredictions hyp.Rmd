@@ -1,0 +1,104 @@
+---
+title: "Coefficients and bias"
+author: "Jacob LaRiviere"
+date: "June 18, 2017, 2017"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+```
+
+## R Markdown
+
+This is an R Markdown document. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+
+
+```{r}
+
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(ggplot2)
+library(reshape2)
+library(boot)
+
+#1a
+x<- lm(formula = logmove ~ log(price)*brand*feat + AGE60 + ETHNIC + EDUC + INCOME + HHLARGE + WORKWOM + HVAL150, data = ojdata)
+summary(x)
+
+
+y<- glm(formula = logmove ~ log(price)*brand*feat + ???, data = ojdata)
+summary(y)
+#1b
+# all
+#1c from .5441 to .5439
+
+set.seed(17)
+cv.error.5 = rep(0,5)
+for ( i in 1:5){
+  glm.fit = y
+  cv.error.5[i] = cv.glm(ojdata, glm.fit, K=5)$delta[1]
+}
+
+mean(cv.error.5)
+
+
+summary(ojdata$HVAL150)
+summary(ojdata$EDUC)
+
+
+v<- glm(formula = logmove ~ log(price)*brand*feat + HVAL150 + EDUC, data = ojdata)
+summary(v)
+coef(v)["HVAL150"]
+
+summary(ojdata$HVAL150)["3rd Qu."]
+
+exp(coef(v)["HVAL150"] * (summary(ojdata$HVAL150)["3rd Qu."] - summary(ojdata$HVAL150)["Median"]))
+
+
+p<- glm(formula = logmove ~ log(price)*brand*feat + HVAL150 + EDUC, data = ojdata)
+summary(p)
+coef(p)["EDUC"]
+
+summary(ojdata$EDUC)["3rd Qu."]
+summary(ojdata$EDUC)["Median"]
+
+exp(coef(p)["EDUC"] * (summary(ojdata$EDUC)["3rd Qu."] - summary(ojdata$EDUC)["Median"]))
+
+
+q<- glm(formula = logmove ~ log(price)*HVAL150 + log(price)*EDUC, data = ojdata)
+summary(q)
+
+#educ greater price sensitivity
+
+
+df1 <-ojdata 
+df1$week<-df1$week+1
+
+# df1 now has NEXT week and not the current one. If we merge this by #weeks now, this is last week's price (e.g., #"lagged price").
+
+myvars <- c("price", "week", "brand","store") 
+
+df1 <- df1[myvars]
+
+oj_with_lagged_prices <- merge(ojdata, df1, by=c("brand","store","week"))
+
+
+t<- glm(formula = logmove ~ price.x, data = oj_with_lagged_prices)
+summary(t)
+
+s<- glm(formula = logmove ~ price.y + price.x *feat* brand*ETHNIC * HVAL150, data = oj_with_lagged_prices)
+summary(s)
+
+set.seed(17)
+cv.error.5 = rep(0,5)
+for ( i in 1:5){
+  glm.fit = s
+  cv.error.5[i] = cv.glm(oj_with_lagged_prices, glm.fit, K=5)$delta[1]
+}
+
+mean(cv.error.5)
+
+```
