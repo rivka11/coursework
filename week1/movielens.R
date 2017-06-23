@@ -55,6 +55,7 @@ ratings %>%
 # hint: try geom_histogram and geom_density
 
 # rank movies by popularity and compute the cdf, or fraction of movies covered by the top-k moves (slide 25)
+
 # hint: use dplyr's rank and arrange functions, and the base R sum and cumsum functions
 
 # plot the CDF of movie popularity

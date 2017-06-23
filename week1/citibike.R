@@ -23,8 +23,10 @@ trips <- mutate(trips, gender = factor(gender, levels=c(0,1,2), labels = c("Unkn
 ########################################
 
 # count the number of trips (= rows in the data frame)
+nrow(trips)
 
 # find the earliest and latest birth years (see help for max and min to deal with NAs)
+summarize(trips, minyear = min("birth year", na.rm=TRUE))
 
 # use filter and grepl to find all trips that either start or end on broadway
 
