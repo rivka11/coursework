@@ -41,8 +41,12 @@ ratings %>%
 ####################
 
 # aggregate ratings by movie, computing mean and number of ratings
+ratings %>%
+  group_by(movie_id) %>%
+  summarise(avgRating = mean(rating), count = n())
 # hint: use the n() function for easy counting within a group
 
+# my own q get avg rating and total ratings overall
 ratings %>% summarise(avgRating = mean(rating), numRatings = n())
 
 # plot distribution of movie popularity (= number of ratings the movie received)
@@ -53,7 +57,9 @@ ratings %>%
   ggplot(aes(x = movie_id)) + geom_histogram() + scale_x_log10() + scale_y_continuous(label = comma)
 # plot distribution of mean ratings by movie (slide 23)
 # hint: try geom_histogram and geom_density
-
+ratings %>%
+  group_by(movie_id) %>%
+  summarise(avgRating = mean(rating), count = n()) %>% ggplot(aes(x= avgRating)) +geom_density() #swap geom_density fr geom_histogram
 # rank movies by popularity and compute the cdf, or fraction of movies covered by the top-k moves (slide 25)
 
 # hint: use dplyr's rank and arrange functions, and the base R sum and cumsum functions
