@@ -73,6 +73,7 @@ ratings %>%
 # aggregate ratings by user, computing mean and number of ratings
 
 # plot distribution of user activity (= number of ratings the user made)
+ratings %>% group_by(user_id, rating) %>% ggplot(aes(x= user_id))
 # hint: try a log scale here
 
 ####################
