@@ -61,9 +61,17 @@ ratings %>%
   group_by(movie_id) %>%
   summarise(avgRating = mean(rating), count = n()) %>% ggplot(aes(x= avgRating)) +geom_density() #swap geom_density fr geom_histogram
 # rank movies by popularity and compute the cdf, or fraction of movies covered by the top-k moves (slide 25)
-
+ratings %>%
+  group_by(movie_id) %>%
+  summarise(moviePop = n()) %>%
+  arrange(desc(moviePop)) %>%
+  mutate(freq = cumsum(movie_id)) %>%
+  ggplot(aes(x = moviePop, y = freq)) + geom_density()
 # hint: use dplyr's rank and arrange functions, and the base R sum and cumsum functions
-
+ratings %>% 
+  group_by(movie_id) %>%
+  summarise(count = n()) %>%
+  rank()
 # plot the CDF of movie popularity
 
 ####################
@@ -73,7 +81,7 @@ ratings %>%
 # aggregate ratings by user, computing mean and number of ratings
 
 # plot distribution of user activity (= number of ratings the user made)
-ratings %>% group_by(user_id, rating) %>% ggplot(aes(x= user_id))
+ratings %>% group_by(user_id) %>% summarise(avgRatingForUser = mean(rating)) %>%ggplot(aes(x= user_id))+ geom_bar() + scale_y_log10()
 # hint: try a log scale here
 
 ####################

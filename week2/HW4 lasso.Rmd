@@ -1,0 +1,94 @@
+---
+title: "Coefficients and bias"
+author: "Jacob LaRiviere"
+date: "June 18, 2017, 2017"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+```
+
+## R Markdown
+
+This is an R Markdown document. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. 
+
+
+```{r}
+library(plyr)
+library(dplyr)
+library(boot)
+library(glmnet)
+
+satdata <- read.csv("sat.csv")
+
+summary(satdata)
+filter(satdata, sat ==1600)
+filter(satdata, nsib==17)
+#get average of those who took the sat
+filter(satdata, satobs==1) %>% summarize(avg =mean(sat)) 
+
+#961
+sat_logit <- glm(formula = satobs~ rank + mlhs + flhs + fcol + mcol + black + hisp + asian + female +rdsc + vocab +
+                   matsc + nsib, data=satdata, family="binomial")
+
+summary(sat_logit)
+
+sat_ols <- glm(formula = satobs~ rank + mlhs + flhs + fcol + mcol + black + hisp + asian + female +rdsc + vocab +
+                 matsc + nsib, data=satdata)
+summary(sat_ols)
+
+
+fit = glmnet(matrix, y) #why use fit not objects?
+
+exp(coef(sat_ols)) # exponentiated coefficients 
+exp(coef(sat_logit)) # exponentiated coefficients 
+
+#############################OJ DATA #######################
+s<- glm(formula = logmove ~ price.y + price.x *feat* brand*ETHNIC * HVAL150, data = oj_with_lagged_prices)
+summary(s)
+
+set.seed(17)
+cv.error.5 = rep(0,5)
+for ( i in 1:5){
+  glm.fit = s
+  cv.error.5[i] = cv.glm(oj_with_lagged_prices, glm.fit, K=5)$delta[1]
+}
+
+mean(cv.error.5)
+
+
+
+matrix <- model.matrix(logmove ~ price.y + price.x *feat* brand*ETHNIC * HVAL150, data = oj_with_lagged_prices)
+y <- as.matrix(oj_with_lagged_prices[ ,c("logmove")])
+lasso_model = cv.glmnet(matrix, y, alpha=1)
+  plot(lasso_model)
+  
+  
+  lasso_model_adjust_alpha = cv.glmnet(matrix, y, alpha=1)
+  plot(lasso_model_adjust_alpha)
+  
+  
+   nocv_lasso_model = glmnet(matrix, y, alpha=1)
+  plot(nocv_lasso_model)
+  
+  set.seed(17) # Set Seed so that same sample can be reproduced in future also
+
+modifiedMatrix <- model.matrix(logmove ~ price.y + price.x *feat* brand*ETHNIC * HVAL150, data = oj_with_lagged_prices)
+sample <- sample(nrow(modifiedMatrix), .1 * nrow(modifiedMatrix))
+train <- oj_with_lagged_prices[sample, ]
+test  <- oj_with_lagged_prices[-sample, ]
+
+ymodified <- as.matrix(train$logmove)
+lasso_model_90_Percent = cv.glmnet(train, ymodified, alpha=1)
+  plot(lasso_model_10_Percent)
+  
+  coef(lasso_model_10_Percent, s="lambda.min")
+
+predict(lasso_model_10_Percent, newx = test, s = "lambda.min")
+lasso_model_10_Percent
+
+
+  
+```

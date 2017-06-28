@@ -1,0 +1,148 @@
+---
+title: "trees"
+author: "Rivka Schuster"
+date: "June 26, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(glmnet)
+n = 100
+
+#The variable p will be the width of that variable.  
+k = 100
+
+#rnorm generates a random draw from a standard normal distribution.
+X = matrix(rnorm(n*k), n, k)
+B = matrix(rnorm(k*1))
+e = matrix(rnorm(n*1))
+Y = X %*% B + e
+
+#get lasso model
+lasso_model_train <- cv.glmnet(X, Y,  alpha = 1)
+plot(lasso_model_train)
+# get ridge model 
+ridge_model_train <- cv.glmnet(X, Y, alpha = 0)
+plot(ridge_model_train)
+
+#get ols model 
+ols_model_train <- glm(Y ~ X)
+coef(ols_model_train, s = "lamda.min")
+summary(ols_model_train)
+
+#create test data
+testX = matrix(rnorm(n*k), n, k)
+teste = matrix(rnorm(n*1), n, 1)
+testY = testX %*% B + teste
+
+#predict on train data should be lower --> check variance
+yPredictLassoTrain <- predict(lasso_model_train, newx = X, s = "lambda.min")
+
+yPredictLassoTest <- predict(lasso_model_train, newx = testX, s = "lambda.min")
+
+yPredictRidgeTrain <- predict(ridge_model_train, newx = X, s = "lambda.min")
+
+yPredictRidgeTest <- predict(ridge_model_train, newx = testX, s = "lambda.min")
+
+yPredictOLSTrain <- predict(ols_model_train, newdata = data.frame(X))
+
+yPredictOLSTest <- predict(ols_model_train, newdata = data.frame(testX))
+
+###############Mean Standard Error ##########
+MSE_Lasso_train<- mean((yPredictLassoTrain- Y) ^2)
+
+MSE_Ridge_train <- mean((yPredictRidgeTrain- Y) ^2)
+
+MSE_OLS_train <- mean((yPredictOLSTrain - Y) ^2)
+
+MSE_Lasso_Test <- mean((yPredictLassoTest - testY) ^2)
+
+MSE_Ridge_test <- mean((yPredictRidgeTest - testY) ^2)
+
+MSE_OLS_test <- mean((yPredictOLSTest - testY) ^2)
+
+
+estimationsLasso <- rep(0,200)
+estimationsRidge <- rep(0, 200)
+estimationsOLS <- rep(0, 200)
+for(i in 1:200){
+  
+  X = matrix(rnorm(n*k), n, k)
+  B = matrix(rnorm(k*1))
+  e = matrix(rnorm(n*1))
+  Y = X %*% B + e
+  
+  #get lasso model
+lasso_model_train <- cv.glmnet(X, Y,  alpha = 1)
+plot(lasso_model)
+# get ridge model 
+ridge_model_train <- cv.glmnet(X, Y, alpha = 0)
+plot(ridge_model)
+
+#get ols model HELP
+ols_model_train <- glm(Y ~ X)
+##################
+testX = matrix(rnorm(n*k), n, k)
+teste = matrix(rnorm(n*1), n, 1)
+testY = testX %*% testB + teste
+
+lasso_model_test <- cv.glmnet(X, Y, alpha = 1)
+ridge_model_test <- cv.glmnet(X, Y, alpha = 0)
+ols_model_test <- glm(Y~X)
+
+
+
+estimationsLasso[i] = MSE_Lasso
+estimationsRidge[i] = MSE_Ridge
+estimationsOLS[i] = MSE_OLS
+  
+  
+}
+
+
+
+```
+```{r trees}
+library(rpart)
+library(rpart.plot)
+df = data.frame(x = 1:100)
+df$e = rnorm(100)
+df$y = df$x + df$y
+treesHis = rpart(y~x, data = df)
+
+
+
+X <- matrix(seq(1, 100, 1))
+e <- matrix(rnorm(100*1), 100, 1)
+y <- X + e
+
+tree <- rpart(y ~X)
+rpart.plot(tree)
+
+#how do splits look?
+#pretty even split because there was a linear relationship (y=x) want to minimize square of error. split in center to remove outliers
+
+y2 <- X^2 +e
+tree2 <- rpart(y2 ~X)
+rpart.plot(tree2)
+
+#here splits cant be in middle cuz its quadratic get HUGE square errors, flat parts of curve have really big leaves. Ulike integral with boxes, the tree adapts to the graph and splits 'un-evenly'
+
+transform(xgreaterThan50, x>50 )
+y3 <- 2*1 
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
