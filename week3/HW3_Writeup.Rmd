@@ -1,0 +1,36 @@
+---
+title: "Writeup"
+author: "Keri Mallari and Rivka Schuster"
+date: "June 28, 2017"
+output: html_document
+---
+
+Contact info
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+load("colleges.RData")
+```
+
+## Introduction
+This is a template for a write-up. You can see more advanced ones [here](http://rmarkdown.rstudio.com/developer_document_templates.html) and [here](http://rmarkdown.rstudio.com/gallery.html).
+
+## Data
+We used data from the US Department of Education to see the costs of colleges and how the relate to student debt. We divided the colleges into public and private non-profit institutions to see the differences in student debt between the type of institution.
+
+## Analyses
+We did a linear regression on the data beause we want to observe the direction of the relationship between cost of college and student debt. The plot below shows the regression model.
+
+```{r plot, echo=FALSE, message=FALSE}
+plot(regplot)
+```
+
+The p-value was `r Pval` which indicates that institutions with higher costs DO indicate the amount of debt students incur through college. The value of 0 allows us to reject the null hypotheses. 
+
+## Discussion
+We think we did a great job. :)
+
+## Appendix
+More details about the data.
+We registered the study at Microsoft Data Science Summer School

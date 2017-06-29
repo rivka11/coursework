@@ -1,0 +1,63 @@
+---
+title: "AnalysisHW3"
+author: "Rivka Schuster"
+date: "June 28, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r get data}
+library(readr)
+library(dplyr)
+library(glmnet)
+library(ggplot2)
+
+MERGED2013_PP <- read_csv("~/GitHub/coursework/week3/MERGED2013_PP.csv")
+Data2013Filtered <- select(MERGED2013_PP, INSTNM, TUITFTE, DEBT_MDN, CONTROL) 
+Data2013Filtered <- filter(Data2013Filtered, DEBT_MDN != "PrivacySuppressed", DEBT_MDN != "NULL")
+Data2013Filtered <- filter(Data2013Filtered, TUITFTE != "NULL" | CONTROL ==3)
+Data2013Filtered <- filter(Data2013Filtered, CONTROL !=3)
+
+
+x <- as.numeric(Data2013Filtered$TUITFTE)
+Data2013Filtered <- mutate(Data2013Filtered, cost = x)
+
+y <- as.numeric(Data2013Filtered$DEBT_MDN)
+Data2013Filtered <- mutate(Data2013Filtered, debt = y)
+
+colleges <- Data2013Filtered
+colleges$CONTROL <- as.factor(colleges$CONTROL)
+
+
+save(Data2013Filtered, file='colleges.RData')
+
+```
+
+
+```{r analysis}
+colleges %>% group_by(CONTROL) %>% ggplot(aes(x= cost, y = debt)) + geom_point(aes(color = CONTROL)) + xlim(0, 30000) + ylim(0, 30000) + scale_y_log10(label = comma)
+
+linearModel = glm(debt ~ cost, data = colleges)
+summary(linearModel)
+
+plot(linearModel)
+
+
+ggplot(colleges, aes(x = cost , y = debt)) + xlim(0, 30000) + ylim(0, 30000) + scale_y_log10(label = comma) + geom_point(aes(color = CONTROL)) +
+  stat_smooth(method = "lm", col = "red")
+
+ggplot(colleges, aes(x = cost , y = debt, color = CONTROL)) + xlim(0, 30000) + ylim(0, 30000) +
+  scale_y_log10(label = comma) + geom_point() +
+  stat_smooth(method = "lm", col = "red")
+
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
